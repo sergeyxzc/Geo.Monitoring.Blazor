@@ -1,0 +1,27 @@
+﻿<nav class="navbar header-navbar p-0">
+    <button class="navbar-toggler bg-primary d-block" @onclick="OnToggleClick">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="ms-3 fw-normal title pe-4">Geo Monitoring</div>
+
+    <form method="post" action="Logout" class="d-flex align-items-end">
+        <button type="submit" class="nav-link btn btn-link">Logout</button>
+    </form>
+    
+    <a href="https://YOUR-SITE.ru" target="_blank">About</a>
+</nav>
+
+@code {
+    [Parameter] public bool ToggleOn { get; set; }
+    [Parameter] public EventCallback<bool> ToggleOnChanged { get; set; }
+
+    async Task OnToggleClick() => await Toggle();
+
+    async Task Toggle(bool? value = null) {
+        var newValue = value ?? !ToggleOn;
+        if(ToggleOn != newValue) {
+            ToggleOn = newValue;
+            await ToggleOnChanged.InvokeAsync(ToggleOn);
+        }
+    }
+}
