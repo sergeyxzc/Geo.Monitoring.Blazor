@@ -3,49 +3,90 @@
 
 <AuthorizeView>
     <Authorized>
-        <DxLayoutBreakpoint MaxWidth="1200" @bind-IsActive="@IsMobileLayout"/>
+        <DxLayoutBreakpoint MaxWidth="1200" @bind-IsActive="@IsMobileLayout" />
+        @*
+        <div class="page">
+        <DxGridLayout CssClass="page-layout">
+        <Rows>
+        @if (IsMobileLayout)
+        {
+        <DxGridLayoutRow Areas="header" Height="auto"></DxGridLayoutRow>
+        <DxGridLayoutRow Areas="sidebar" Height="auto"></DxGridLayoutRow>
+        <DxGridLayoutRow Areas="content" />
+        }
+        else
+        {
+        <DxGridLayoutRow Areas="header header" Height="auto" />
+        <DxGridLayoutRow Areas="@(IsSidebarExpanded ? "sidebar content" : "content content")" />
+        }
+        </Rows>
+        <Columns>
+        @if (!IsMobileLayout)
+        {
+        <DxGridLayoutColumn Width="auto" />
+        <DxGridLayoutColumn />
+        }
+        </Columns>
+        <Items>
+        <DxGridLayoutItem Area="header" CssClass="layout-item">
+        <Template>
+        <Header @bind-ToggleOn="@IsSidebarExpanded" />
+        </Template>
+        </DxGridLayoutItem>
+        <DxGridLayoutItem Area="sidebar" CssClass="layout-item">
+        <Template>
+        <NavMenu StateCssClass="@NavMenuCssClass" />
+        </Template>
+        </DxGridLayoutItem>
+        <DxGridLayoutItem Area="content" CssClass="content px-4 layout-item">
+        <Template>
+        @Body
+        </Template>
+        </DxGridLayoutItem>
+        </Items>
+        </DxGridLayout>
+        </div>*@
+
+
 
         <div class="page">
-            <DxGridLayout CssClass="page-layout">
+            <DxGridLayout CssClass="w-100 ch-480">
                 <Rows>
-                    @if (IsMobileLayout)
-                    {
-                        <DxGridLayoutRow Areas="header" Height="auto"></DxGridLayoutRow>
-                        <DxGridLayoutRow Areas="sidebar" Height="auto"></DxGridLayoutRow>
-                        <DxGridLayoutRow Areas="content"/>
-                    }
-                    else
-                    {
-                        <DxGridLayoutRow Areas="header header" Height="auto"/>
-                        <DxGridLayoutRow Areas="@(IsSidebarExpanded ? "sidebar content" : "content content")"/>
-                    }
+                    <DxGridLayoutRow Height="auto" />
+                    <DxGridLayoutRow Areas="@(IsSidebarExpanded ? "sidebar content" : "content content")" />
                 </Rows>
                 <Columns>
-                    @if (!IsMobileLayout)
-                    {
-                        <DxGridLayoutColumn Width="auto"/>
-                        <DxGridLayoutColumn/>
-                    }
+                    <DxGridLayoutColumn Width="250px" />
+                    <DxGridLayoutColumn />
                 </Columns>
                 <Items>
-                    <DxGridLayoutItem Area="header" CssClass="layout-item">
+                    <DxGridLayoutItem Row="0" Column="1" ColumnSpan="2">
                         <Template>
-                            <Header @bind-ToggleOn="@IsSidebarExpanded"/>
+                            <Header @bind-ToggleOn="@IsSidebarExpanded"></Header>
                         </Template>
                     </DxGridLayoutItem>
-                    <DxGridLayoutItem Area="sidebar" CssClass="layout-item">
+
+
+                    <DxGridLayoutItem Row="0" Column="0" RowSpan="2">
                         <Template>
-                            <NavMenu StateCssClass="@NavMenuCssClass"/>
+                            <div class="sidebar">
+                                <NavMenu StateCssClass="@NavMenuCssClass" />
+                            </div>
                         </Template>
                     </DxGridLayoutItem>
-                    <DxGridLayoutItem Area="content" CssClass="content px-4 layout-item">
+
+                    <DxGridLayoutItem Row="1" Column="1">
                         <Template>
-                            @Body
+                            <article class="content px-4">
+                                @Body
+                            </article>
                         </Template>
                     </DxGridLayoutItem>
                 </Items>
             </DxGridLayout>
         </div>
+
+
     </Authorized>
 
     <NotAuthorized>
@@ -57,7 +98,7 @@
 @code {
     string? NavMenuCssClass { get; set; }
     bool _isMobileLayout;
-    
+
     public bool IsMobileLayout
     {
         get => _isMobileLayout;
@@ -98,5 +139,20 @@
     public void Dispose()
     {
         NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+
+    [Parameter] public bool ToggleOn { get; set; }
+    [Parameter] public EventCallback<bool> ToggleOnChanged { get; set; }
+
+    async Task OnToggleClick() => await Toggle();
+
+    async Task Toggle(bool? value = null)
+    {
+        var newValue = value ?? !ToggleOn;
+        if (ToggleOn != newValue)
+        {
+            ToggleOn = newValue;
+            await ToggleOnChanged.InvokeAsync(ToggleOn);
+        }
     }
 }

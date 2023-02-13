@@ -1,15 +1,54 @@
-﻿<div class="sidebar @StateCssClass">
-<DxTreeView AllowSelectNodes="true" CssClass="app-sidebar">
-    <Nodes>
-        <DxTreeViewNode NavigateUrl="dashboard" Text="Dashboard"></DxTreeViewNode>
+﻿@*<div class="sidebar @StateCssClass">
+    <DxTreeView AllowSelectNodes="true" CssClass="app-sidebar">
+        <Nodes>
+            <DxTreeViewNode NavigateUrl="dashboard" Text="Dashboard"></DxTreeViewNode>
             <DxTreeViewNode NavigateUrl="loggers" Text="Loggers"></DxTreeViewNode>
-@*        <DxTreeViewNode NavigateUrl="./" Text="Overview"></DxTreeViewNode>
-        <DxTreeViewNode NavigateUrl="grid" Text="Grid"></DxTreeViewNode>
-        <DxTreeViewNode NavigateUrl="grid" Text="Grid"></DxTreeViewNode>*@
-    </Nodes>
-</DxTreeView>
+        </Nodes>
+    </DxTreeView>
 </div>
 
 @code {
     [Parameter] public string? StateCssClass { get; set; }
+}*@
+
+@*nav-scrollable*@
+<div class="sidebar @StateCssClass">
+    <nav class="flex-column">
+        <div class="title justify-content-center px-3 py-3">
+            <p class="text-uppercase fw-normal h4 text-light bg-transparent">geo monitoring</p>
+        </div>
+
+        <div class="nav-item pt-3 px-3">
+            <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">
+                <span class="oi oi-dashboard" aria-hidden="true"></span> Dashboard
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="loggers">
+                <span class="oi oi-fork" aria-hidden="true"></span> Loggers
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="settings">
+                <span class="oi oi-cog" aria-hidden="true"></span> Settings
+            </NavLink>
+        </div>
+    </nav>
+</div>
+
+@code {
+    [Parameter] public string? StateCssClass 
+    { 
+        get; 
+        set;
+    }
+    
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
 }
