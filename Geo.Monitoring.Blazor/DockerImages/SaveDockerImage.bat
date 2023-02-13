@@ -1,0 +1,1 @@
+docker save geomonitoringblazor:dev --output geomonitoringblazor.tar
