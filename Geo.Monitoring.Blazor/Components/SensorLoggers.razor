@@ -1,0 +1,46 @@
+﻿@page "/loggers"
+
+<div class="h5 text-light">
+    <p>Loggers</p>
+</div>
+<hr class="text-dark" />
+
+@if (Busy)
+{
+    <div class="d-flex align-content-center justify-content-center">Loading...</div>
+}
+else
+{
+    <div class="d-flex flex-fill">
+        <DxGrid Data="@GeoLoggers">
+            <Columns>
+                <DxGridDataColumn FieldName="Id"
+                                  DisplayFormat="D" 
+                                  Width="80px"
+                                  TextAlignment="GridTextAlignment.Left" />
+
+                <DxGridDataColumn FieldName="Name" TextAlignment="GridTextAlignment.Left" />
+
+                <DxGridDataColumn FieldName="Sensors" TextAlignment="GridTextAlignment.Left" />
+
+                <DxGridDataColumn FilterMode="GridColumnFilterMode.DisplayText" Caption="Actions" TextAlignment="GridTextAlignment.Left">
+                    <CellDisplayTemplate>
+                        <div class="d-flex flex-row">
+                            <div class="d-flex justify-content-start">
+                                @{
+                                    var item = @context.DataItem as GeoLoggerViewModel;
+                                }
+                                <DxButton Click="@((x) => OnGoToLoggerClick(item))" 
+                                          IconCssClass="oi oi-menu"
+                                          SizeMode="SizeMode.Medium"
+                                          RenderStyle="ButtonRenderStyle.Primary"
+                                          RenderStyleMode="ButtonRenderStyleMode.Text"
+                                          title="Go to logger"/>
+                            </div>
+                        </div>
+                    </CellDisplayTemplate>
+                </DxGridDataColumn>
+            </Columns>
+        </DxGrid>   
+    </div>
+}

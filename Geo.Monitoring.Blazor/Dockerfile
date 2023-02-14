@@ -3,10 +3,14 @@
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
 WORKDIR /app
 EXPOSE 80
-EXPOSE 443
+#EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
+
+COPY ["../../devexpress-nuget-pkgs", "./devexpress-nuget-pkgs"]
+COPY ["../../nuget.config", "./nuget.config"]
+
 COPY ["Geo.Monitoring.Blazor/Geo.Monitoring.Blazor.csproj", "Geo.Monitoring.Blazor/"]
 RUN dotnet restore "Geo.Monitoring.Blazor/Geo.Monitoring.Blazor.csproj"
 COPY . .

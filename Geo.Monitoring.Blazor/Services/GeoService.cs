@@ -28,7 +28,7 @@
         public double? MaxLimit { get; set; }
     }
 
-    public class Logger
+    public class SensorLogger
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -42,23 +42,30 @@
         public double? MaxLimit { get; set; }
     }
 
+    public class GetLoggerRequest
+    {
+        public int LoggerId { get; set; }
+    }
+
+
     public interface IGeoService
     {
-        Task<IReadOnlyList<Logger>> GetLoggersAsync(CancellationToken cancellationToken);
+        Task<IReadOnlyList<SensorLogger>> GetLoggersAsync(CancellationToken cancellationToken);
+        Task<SensorLogger> GetLoggerAsync(GetLoggerRequest request, CancellationToken cancellationToken);
         Task<IReadOnlyList<SensorPoint>> GetSensorValuesAsync(SensorValuesRequest request, CancellationToken cancellationToken);
         Task UpdateSensorLimitsAsync(UpdateSensorLimitsRequest request, CancellationToken cancellationToken);
     }
 
     public class GeoServiceMock : IGeoService
     {
-        private readonly Logger[] _loggers;
+        private readonly SensorLogger[] _loggers;
 
         public GeoServiceMock()
         {
             var r = new Random();
 
             _loggers = Enumerable.Range(1, 10)
-                .Select(i => new Logger()
+                .Select(i => new SensorLogger()
                 {
                     Id = i,
                     Name = $"Logger-{i}",
@@ -66,7 +73,7 @@
                         .Select(s => new SensorDesc()
                         {
                             Id = s,
-                            Type = r.Next(1) == 0 ? SensorType.Pressure : SensorType.Gyroscope,
+                            Type = r.Next(2) == 0 ? SensorType.Pressure : SensorType.Gyroscope,
                             MaxLimit = r.Next(50, 100),
                             MinLimit = r.Next(10, 40)
                         })
@@ -75,15 +82,21 @@
                 .ToArray();
         }
 
-        public async Task<IReadOnlyList<Logger>> GetLoggersAsync(CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<SensorLogger>> GetLoggersAsync(CancellationToken cancellationToken)
         {
-            await Task.Delay(3000, cancellationToken);
+            await Task.Delay(1000, cancellationToken);
             return _loggers;
+        }
+
+        public async Task<SensorLogger> GetLoggerAsync(GetLoggerRequest request, CancellationToken cancellationToken)
+        {
+            await Task.Delay(1000, cancellationToken);
+            return _loggers.First(x => x.Id == request.LoggerId);
         }
 
         public async Task<IReadOnlyList<SensorPoint>> GetSensorValuesAsync(SensorValuesRequest request, CancellationToken cancellationToken)
         {
-            await Task.Delay(3000, cancellationToken);
+            await Task.Delay(1000, cancellationToken);
 
             var start = request.From ?? DateTime.UtcNow.AddYears(-1);
             var end = request.To ?? DateTime.UtcNow;
@@ -95,10 +108,15 @@
 
             var r = new Random();
 
-            var result = Enumerable.Range(1, 500).Select(i => new SensorPoint()
+            var result = Enumerable.Range(1, 500).Select(i =>
             {
-                Timestamp = start.AddHours(step),
-                Value = r.NextDouble() * 100.0
+                var sp = new SensorPoint()
+                {
+                    Timestamp = start.AddHours(step),
+                    Value = r.NextDouble() * 100.0
+                };
+                start = sp.Timestamp;
+                return sp;
             }).ToArray();
 
             return result;

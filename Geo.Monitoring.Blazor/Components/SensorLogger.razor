@@ -1,0 +1,46 @@
+﻿@page "/logger/{LoggerId:int}"
+
+<div class="h5 text-light">
+    <p>Logger name: @LoggerName</p>
+</div>
+<hr class="text-dark"/>
+
+@if (Busy)
+{
+    <div class="d-flex align-content-center justify-content-center">Loading...</div>
+}
+else
+{
+    <div class="d-flex flex-fill">
+        <DxGrid Data="@Sensors">
+            <Columns>
+                <DxGridDataColumn FieldName="Id"
+                                  DisplayFormat="D"
+                                  TextAlignment="GridTextAlignment.Left" />
+
+                <DxGridDataColumn FieldName="Type" TextAlignment="GridTextAlignment.Left" />
+
+                <DxGridDataColumn FieldName="MinLimit" Caption="Min limit" TextAlignment="GridTextAlignment.Left" />
+                <DxGridDataColumn FieldName="MaxLimit" Caption="Max limit" TextAlignment="GridTextAlignment.Left" />
+
+                <DxGridDataColumn FilterMode="GridColumnFilterMode.DisplayText" Caption="Actions" TextAlignment="GridTextAlignment.Left">
+                    <CellDisplayTemplate>
+                        <div class="d-flex flex-row">
+                            <div class="d-flex justify-content-start">
+                                @{
+                                    var item = @context.DataItem as SensorViewModel;
+                                }
+                                <DxButton Click="@((x) => OnGoToSensorClick(item))" 
+                                          IconCssClass="oi oi-menu"
+                                          SizeMode="SizeMode.Medium"
+                                          RenderStyle="ButtonRenderStyle.Primary"
+                                          RenderStyleMode="ButtonRenderStyleMode.Text"
+                                          title="Go to sensor"/>
+                            </div>
+                        </div>
+                    </CellDisplayTemplate>
+                </DxGridDataColumn>
+            </Columns>
+        </DxGrid>   
+    </div>
+}
