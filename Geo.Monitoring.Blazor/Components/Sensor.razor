@@ -1,0 +1,46 @@
+﻿@page "/sensor/{SensorId:int}"
+@using Geo.Monitoring.Blazor.Services
+
+<div class="h5 text-light d-flex flex-column">
+    <p>Sensor: @SensorId</p>
+</div>
+<hr class="text-dark" />
+
+@if (Busy)
+{
+    <div class="d-flex align-content-center justify-content-center">Loading...</div>
+}
+else
+{
+    <div class="d-flex flex-fill">
+        <DxChart T="SensorPoint"
+                 Data="@SensorPoints"
+                 CssClass="w-100">
+            <DxChartLegend Position="RelativePosition.Inside"
+                           VerticalAlignment="VerticalEdge.Top"
+                           HorizontalAlignment="HorizontalAlignment.Right" />
+            <DxChartLineSeries T="SensorPoint"
+                               TArgument="DateTime"
+                               TValue="double"
+                               ArgumentField="i => i.Timestamp"
+                               ValueField="i => i.Value"
+                               Name="Sensor">
+                <DxChartSeriesPoint Visible="false" />
+                <DxChartAggregationSettings Enabled="false" 
+                                            Method="ChartAggregationMethod.Average" />
+            </DxChartLineSeries>
+            <DxChartArgumentAxis>
+                <DxChartAxisRange StartValue="@StartDateTime" EndValue="@EndDateTime" />
+            </DxChartArgumentAxis>
+            <DxChartZoomAndPanSettings ArgumentAxisZoomAndPanMode="ChartAxisZoomAndPanMode.Both" />
+            <DxChartScrollBarSettings ArgumentAxisScrollBarVisible="true" 
+                                      ArgumentAxisScrollBarPosition="ChartScrollBarPosition.Bottom" />
+            <DxChartTooltip Enabled="true" Position="RelativePosition.Inside">
+                <div style="margin: 0.75rem">
+                    <div class="font-weight-bold">T = @(((DateTime)context.Point.Argument).ToString("d"))</div>
+                    <div>V = @(context.Point.Value)</div>
+                </div>
+            </DxChartTooltip>
+        </DxChart>
+    </div>
+}

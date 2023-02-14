@@ -1,14 +1,13 @@
-﻿<nav class="navbar header-navbar p-0">
-    <button class="navbar-toggler bg-primary d-block" @onclick="OnToggleClick">
-        <span class="navbar-toggler-icon"></span>
+﻿<nav class="navbar header-navbar d-flex flex-row mb-3">
+    <button class="navbar-toggler nav-link bg-transparent btn btn-light d-block me-auto" @onclick="OnToggleClick">
+        <span class="oi oi-menu"></span>
     </button>
-    <div class="ms-3 fw-normal title pe-4">Geo Monitoring</div>
 
-    <form method="post" action="Logout" class="d-flex align-items-end">
+    <form method="post" action="Logout">
         <button type="submit" class="nav-link btn btn-link">Logout</button>
     </form>
-    
-    <a href="https://YOUR-SITE.ru" target="_blank">About</a>
+
+    <a class="mx-2" href="https://site.com" target="_blank">About</a>
 </nav>
 
 @code {
