@@ -47,12 +47,21 @@
         public int LoggerId { get; set; }
     }
 
+    public class Sensor
+    {
+        public int Id { get; set; }
+        public double? Min { get; set; }
+        public double? Max { get; set; }
+    }
+
+    public record SensorRequest(int SensorId);
 
     public interface IGeoService
     {
         Task<IReadOnlyList<SensorLogger>> GetLoggersAsync(CancellationToken cancellationToken);
         Task<SensorLogger> GetLoggerAsync(GetLoggerRequest request, CancellationToken cancellationToken);
         Task<IReadOnlyList<SensorPoint>> GetSensorValuesAsync(SensorValuesRequest request, CancellationToken cancellationToken);
+        Task<Sensor> GetSensorAsync(SensorRequest request, CancellationToken cancellationToken);
         Task UpdateSensorLimitsAsync(UpdateSensorLimitsRequest request, CancellationToken cancellationToken);
     }
 
@@ -120,6 +129,17 @@
             }).ToArray();
 
             return result;
+        }
+
+        public async Task<Sensor> GetSensorAsync(SensorRequest request, CancellationToken cancellationToken)
+        {
+            await Task.Delay(1000, cancellationToken);
+            return new Sensor()
+            {
+                Id = request.SensorId,
+                Max = 87.0d,
+                Min = 13.0d
+            };
         }
 
         public async Task UpdateSensorLimitsAsync(UpdateSensorLimitsRequest request, CancellationToken cancellationToken)
