@@ -1,5 +1,6 @@
 ﻿@page "/sensor/{SensorId:int}"
 @using Geo.Monitoring.Blazor.Services
+@using System.Drawing
 
 <div class="h5 text-light d-flex flex-column">
     <p>Sensor: @SensorId</p>
@@ -13,28 +14,53 @@
 else
 {
     <div class="d-flex flex-fill">
-        <DxChart T="SensorPoint"
-                 Data="@SensorPoints"
-                 CssClass="w-100">
+        <DxChart T="SensorPointViewModel"
+             Data="@SensorPoints"
+             CssClass="w-100">
+
             <DxChartLegend Position="RelativePosition.Inside"
-                           VerticalAlignment="VerticalEdge.Top"
-                           HorizontalAlignment="HorizontalAlignment.Right" />
-            <DxChartLineSeries T="SensorPoint"
-                               TArgument="DateTime"
-                               TValue="double"
-                               ArgumentField="i => i.Timestamp"
-                               ValueField="i => i.Value"
-                               Name="Sensor">
+                       VerticalAlignment="VerticalEdge.Top"
+                       HorizontalAlignment="HorizontalAlignment.Right" />
+
+            <DxChartLineSeries T="SensorPointViewModel"
+                           TArgument="DateTime"
+                           TValue="double"
+                           ArgumentField="i => i.Timestamp"
+                           ValueField="i => i.Value"
+                           Name="Sensor">
                 <DxChartSeriesPoint Visible="false" />
-                <DxChartAggregationSettings Enabled="false" 
-                                            Method="ChartAggregationMethod.Average" />
+                <DxChartAggregationSettings Enabled="false"
+                                        Method="ChartAggregationMethod.Average" />
             </DxChartLineSeries>
+            
+            <DxChartValueAxis>
+                @if (SensorInfo.Max.HasValue)
+                {
+                    <DxChartConstantLine Value="@(SensorInfo.Max.Value)" Color="Color.DarkGoldenrod" Width="3">
+                        <DxChartConstantLineLabel 
+                            Text="Max"
+                            HorizontalAlignment="HorizontalAlignment.Center"
+                            Position="RelativePosition.Inside" />
+                    </DxChartConstantLine>
+                }
+
+                @if (SensorInfo.Min.HasValue)
+                {
+                    <DxChartConstantLine Value="@(SensorInfo.Min.Value)" Color="Color.DarkOliveGreen" Width="3">
+                        <DxChartConstantLineLabel 
+                            Text="Min"
+                            HorizontalAlignment="HorizontalAlignment.Center"
+                            Position="RelativePosition.Inside" />
+                    </DxChartConstantLine>
+                }
+            </DxChartValueAxis>
+            
             <DxChartArgumentAxis>
                 <DxChartAxisRange StartValue="@StartDateTime" EndValue="@EndDateTime" />
             </DxChartArgumentAxis>
             <DxChartZoomAndPanSettings ArgumentAxisZoomAndPanMode="ChartAxisZoomAndPanMode.Both" />
-            <DxChartScrollBarSettings ArgumentAxisScrollBarVisible="true" 
-                                      ArgumentAxisScrollBarPosition="ChartScrollBarPosition.Bottom" />
+            <DxChartScrollBarSettings ArgumentAxisScrollBarVisible="true"
+                                  ArgumentAxisScrollBarPosition="ChartScrollBarPosition.Bottom" />
             <DxChartTooltip Enabled="true" Position="RelativePosition.Inside">
                 <div style="margin: 0.75rem">
                     <div class="font-weight-bold">T = @(((DateTime)context.Point.Argument).ToString("d"))</div>
