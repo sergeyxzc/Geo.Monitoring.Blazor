@@ -1,20 +1,21 @@
 ﻿using Geo.Monitoring.Blazor.Services;
+using Geo.Monitoring.Blazor.Services.Geo;
 using Microsoft.AspNetCore.Components;
 
 namespace Geo.Monitoring.Blazor.Components
 {
     public class GeoLoggerViewModel
     {
-        private readonly Services.SensorLogger _logger;
+        private readonly Services.Geo.SensorLoggerDesc _logger;
 
-        public GeoLoggerViewModel(Services.SensorLogger logger)
+        public GeoLoggerViewModel(Services.Geo.SensorLoggerDesc logger)
         {
             _logger = logger;
-            Sensors = logger?.Sensors.Count ?? 0;
+            Sensors = logger?.SensorCount ?? 0;
         }
 
         public int Id => _logger.Id;
-        public string? Name => _logger.Name;
+        public string Name => _logger.Name;
         public int Sensors { get; }
     }
 
@@ -22,7 +23,7 @@ namespace Geo.Monitoring.Blazor.Components
     {
         public bool Busy { get; set; }
         public IReadOnlyList<GeoLoggerViewModel> GeoLoggers { get; set; }
-        [Inject] public IGeoService GeoService { get; set; }
+        [Inject] public IGeoServiceClient GeoService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
 
 
@@ -31,8 +32,8 @@ namespace Geo.Monitoring.Blazor.Components
             try
             {
                 Busy = true;
-                var loggers = await GeoService.GetLoggersAsync(CancellationToken.None);
-                GeoLoggers = loggers?.Select(x => new GeoLoggerViewModel(x)).ToList();
+                var loggers = await GeoService.GetLoggersAsync(ComponentCancellationToken);
+                GeoLoggers = loggers?.Loggers?.Select(x => new GeoLoggerViewModel(x)).ToList();
             }
             finally
             {
@@ -40,7 +41,7 @@ namespace Geo.Monitoring.Blazor.Components
             }
         }
 
-        private void OnGoToLoggerClick(GeoLoggerViewModel? vm)
+        private void OnGoToLoggerClick(GeoLoggerViewModel vm)
         {
             if(vm == null)
                 return;

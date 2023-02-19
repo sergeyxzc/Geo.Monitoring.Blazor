@@ -1,5 +1,6 @@
 ﻿using DevExpress.Blazor.Internal.ComponentStructureHelpers;
 using Geo.Monitoring.Blazor.Services;
+using Geo.Monitoring.Blazor.Services.Geo;
 using Microsoft.AspNetCore.Components;
 
 namespace Geo.Monitoring.Blazor.Components
@@ -8,7 +9,7 @@ namespace Geo.Monitoring.Blazor.Components
     {
         private readonly SensorDesc _sensor;
 
-        public SensorViewModel(Services.SensorDesc sensor)
+        public SensorViewModel(Services.Geo.SensorDesc sensor)
         {
             _sensor = sensor;
         }
@@ -27,7 +28,7 @@ namespace Geo.Monitoring.Blazor.Components
         public bool Busy { get; set; }
 
         public IReadOnlyList<SensorViewModel> Sensors { get; set; }
-        [Inject] public IGeoService GeoService { get; set; }
+        [Inject] public IGeoServiceClient GeoService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
         public string LoggerName { get; set; }
 
@@ -36,9 +37,9 @@ namespace Geo.Monitoring.Blazor.Components
             try
             {
                 Busy = true;
-                var logger = await GeoService.GetLoggerAsync(new GetLoggerRequest() { LoggerId = LoggerId }, CancellationToken.None);
+                var logger = await GeoService.GetLoggerAsync(LoggerId, ComponentCancellationToken);
                 Sensors = logger.Sensors.Select(x => new SensorViewModel(x)).ToList();
-                LoggerName = logger.Name;
+                LoggerName = logger.Logger.Name;
             }
             finally
             {
@@ -46,7 +47,7 @@ namespace Geo.Monitoring.Blazor.Components
             }
         }
 
-        private void OnGoToSensorClick(SensorViewModel? vm)
+        private void OnGoToSensorClick(SensorViewModel vm)
         {
             if (vm == null)
                 return;

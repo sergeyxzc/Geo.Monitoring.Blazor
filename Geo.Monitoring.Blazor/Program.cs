@@ -1,4 +1,5 @@
 using Geo.Monitoring.Blazor.Services;
+using Geo.Monitoring.Blazor.Services.Geo;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.DataProtection;
@@ -23,7 +24,8 @@ builder.Services.AddServerSideBlazor();
 
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider>();
 builder.Services.AddScoped<IIdentityUserService, IdentityUserService>();
-builder.Services.AddScoped<IGeoService, GeoServiceMock>();
+builder.Services.AddGeoServiceOptions(builder.Configuration);
+builder.Services.AddGeoServiceClient();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddDevExpressBlazor(options =>

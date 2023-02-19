@@ -96,7 +96,7 @@
 </AuthorizeView>
 
 @code {
-    string? NavMenuCssClass { get; set; }
+    string NavMenuCssClass { get; set; }
     bool _isMobileLayout;
 
     public bool IsMobileLayout
@@ -127,7 +127,7 @@
     {
         NavigationManager.LocationChanged += OnLocationChanged;
     }
-    async void OnLocationChanged(object? sender, LocationChangedEventArgs args)
+    async void OnLocationChanged(object sender, LocationChangedEventArgs args)
     {
         if (IsMobileLayout)
         {

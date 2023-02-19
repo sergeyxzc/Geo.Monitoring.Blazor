@@ -1,4 +1,6 @@
-﻿using Geo.Monitoring.Blazor.Services;
+﻿using Geo.Monitoring.Blazor.Components.Common;
+using Geo.Monitoring.Blazor.Services;
+using Geo.Monitoring.Blazor.Services.Geo;
 using Microsoft.AspNetCore.Components;
 
 namespace Geo.Monitoring.Blazor.Components
@@ -8,9 +10,9 @@ namespace Geo.Monitoring.Blazor.Components
     public partial class Sensor
     {
         [Parameter] public int SensorId { get; set; }
-        [Inject] public IGeoService GeoService { get; set; }
+        [Inject] public IGeoServiceClient GeoService { get; set; }
         public List<SensorPointViewModel> SensorPoints { get; set; }
-        public Services.Sensor SensorInfo { get; set; }
+        public Services.Geo.SensorDesc SensorInfo { get; set; }
 
         public DateTime StartDateTime { get; set; }
         public DateTime EndDateTime { get; set; }
@@ -21,9 +23,10 @@ namespace Geo.Monitoring.Blazor.Components
             try
             {
                 Busy = true;
-                SensorInfo = await GeoService.GetSensorAsync(new SensorRequest(SensorId), CancellationToken.None);
+                SensorInfo = await GeoService.GetSensorAsync(SensorId, ComponentCancellationToken);
 
-                var sensorPoints = await GeoService.GetSensorValuesAsync(new SensorValuesRequest() { SensorId = SensorId }, CancellationToken.None);
+                var sensorPoints = await GeoService.GetSensorValuesAsync(SensorId, ComponentCancellationToken);
+
                 SensorPoints = sensorPoints
                     .OrderBy(x => x.Timestamp)
                     .Select(x => new SensorPointViewModel(x.Value, x.Timestamp))
