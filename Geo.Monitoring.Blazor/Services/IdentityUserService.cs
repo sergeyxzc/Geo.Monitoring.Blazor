@@ -76,8 +76,8 @@ public class IdentityUserService : IIdentityUserService
         await _accessor.HttpContext.SignOutAsync();
     }
 
-    public async Task<bool> ValidateAuthenticationStateAsync(ClaimsPrincipal authenticationStateUser)
+    public Task<bool> ValidateAuthenticationStateAsync(ClaimsPrincipal authenticationStateUser)
     {
-        return true;
+        return Task.FromResult(true);
     }
 }

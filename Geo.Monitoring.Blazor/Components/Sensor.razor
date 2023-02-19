@@ -1,6 +1,6 @@
 ﻿@page "/sensor/{SensorId:int}"
-@using Geo.Monitoring.Blazor.Services
 @using System.Drawing
+@inherits Geo.Monitoring.Blazor.Components.Common.ApplicationComponentBase
 
 <div class="h5 text-light d-flex flex-column">
     <p>Sensor: @SensorId</p>
@@ -34,9 +34,9 @@ else
             </DxChartLineSeries>
             
             <DxChartValueAxis>
-                @if (SensorInfo.Max.HasValue)
+                @if (SensorInfo.MaxLimit.HasValue)
                 {
-                    <DxChartConstantLine Value="@(SensorInfo.Max.Value)" Color="Color.DarkGoldenrod" Width="3">
+                    <DxChartConstantLine Value="@(SensorInfo.MaxLimit.Value)" Color="Color.DarkGoldenrod" Width="3">
                         <DxChartConstantLineLabel 
                             Text="Max"
                             HorizontalAlignment="HorizontalAlignment.Center"
@@ -44,9 +44,9 @@ else
                     </DxChartConstantLine>
                 }
 
-                @if (SensorInfo.Min.HasValue)
+                @if (SensorInfo.MinLimit.HasValue)
                 {
-                    <DxChartConstantLine Value="@(SensorInfo.Min.Value)" Color="Color.DarkOliveGreen" Width="3">
+                    <DxChartConstantLine Value="@(SensorInfo.MinLimit.Value)" Color="Color.DarkOliveGreen" Width="3">
                         <DxChartConstantLineLabel 
                             Text="Min"
                             HorizontalAlignment="HorizontalAlignment.Center"
@@ -64,7 +64,7 @@ else
             <DxChartTooltip Enabled="true" Position="RelativePosition.Inside">
                 <div style="margin: 0.75rem">
                     <div class="font-weight-bold">T = @(((DateTime)context.Point.Argument).ToString("d"))</div>
-                    <div>V = @(context.Point.Value)</div>
+                    <div>V = @(((double)context.Point.Value).ToString("F2"))</div>
                 </div>
             </DxChartTooltip>
         </DxChart>
