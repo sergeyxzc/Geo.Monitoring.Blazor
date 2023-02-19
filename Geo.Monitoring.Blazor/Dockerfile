@@ -8,8 +8,8 @@ EXPOSE 80
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 
-COPY ["../../devexpress-nuget-pkgs", "./devexpress-nuget-pkgs"]
-COPY ["../../nuget.config", "./nuget.config"]
+COPY ["../devexpress-nuget", "./devexpress-nuget"]
+COPY ["../nuget-config/nuget.config", "./nuget.config"]
 
 COPY ["Geo.Monitoring.Blazor/Geo.Monitoring.Blazor.csproj", "Geo.Monitoring.Blazor/"]
 RUN dotnet restore "Geo.Monitoring.Blazor/Geo.Monitoring.Blazor.csproj"
