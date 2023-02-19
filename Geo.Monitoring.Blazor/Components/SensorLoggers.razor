@@ -1,17 +1,17 @@
 ﻿@page "/loggers"
 @inherits Geo.Monitoring.Blazor.Components.Common.ApplicationComponentBase
 
-<div class="h5 text-light">
-    <p>Loggers</p>
-</div>
-<hr class="text-dark" />
-
 @if (Busy)
 {
     <div class="d-flex align-content-center justify-content-center">Loading...</div>
 }
 else
 {
+    <div class="h5 text-muted">
+        <p>Loggers</p>
+    </div>
+    <hr class="text-dark" />
+
     <div class="d-flex flex-fill">
         <DxGrid Data="@GeoLoggers">
             <Columns>

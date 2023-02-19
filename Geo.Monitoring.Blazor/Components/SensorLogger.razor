@@ -1,17 +1,18 @@
 ﻿@page "/logger/{LoggerId:int}"
 @inherits Geo.Monitoring.Blazor.Components.Common.ApplicationComponentBase
 
-<div class="h5 text-light">
-    <p>Logger name: @LoggerName</p>
-</div>
-<hr class="text-dark"/>
-
 @if (Busy)
 {
     <div class="d-flex align-content-center justify-content-center">Loading...</div>
 }
 else
 {
+    <div class="h5 d-flex flex-column text-muted">
+        <p>Logger Id: @LoggerId</p>
+        <p>Logger name: @LoggerName</p>
+    </div>
+    <hr class="text-dark"/>
+
     <div class="d-flex flex-fill">
         <DxGrid Data="@Sensors">
             <Columns>
@@ -21,6 +22,7 @@ else
 
                 <DxGridDataColumn FieldName="Type" TextAlignment="GridTextAlignment.Left" />
 
+                <DxGridDataColumn FieldName="LastValue" Caption="Last value" TextAlignment="GridTextAlignment.Left" />
                 <DxGridDataColumn FieldName="MinLimit" Caption="Min limit" TextAlignment="GridTextAlignment.Left" />
                 <DxGridDataColumn FieldName="MaxLimit" Caption="Max limit" TextAlignment="GridTextAlignment.Left" />
 

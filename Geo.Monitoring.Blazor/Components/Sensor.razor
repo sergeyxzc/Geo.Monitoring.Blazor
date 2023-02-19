@@ -2,10 +2,6 @@
 @using System.Drawing
 @inherits Geo.Monitoring.Blazor.Components.Common.ApplicationComponentBase
 
-<div class="h5 text-light d-flex flex-column">
-    <p>Sensor: @SensorId</p>
-</div>
-<hr class="text-dark" />
 
 @if (Busy)
 {
@@ -13,6 +9,14 @@
 }
 else
 {
+    <div class="h5 d-flex flex-column text-muted">
+        <p>Sensor id: @SensorInfo.Id</p>
+        <p>Sensor type: @SensorInfo.Type.ToString("G")</p>
+        <p>Min limit: @(SensorInfo.MinLimit.HasValue ? SensorInfo.MinLimit.Value.ToString("N") : "N/A")</p>
+        <p>Max limit: @(SensorInfo.MaxLimit.HasValue ? SensorInfo.MaxLimit.Value.ToString("N") : "N/A")</p>
+    </div>
+    <hr class="text-dark" />
+
     <div class="d-flex flex-fill">
         <DxChart T="SensorPointViewModel"
              Data="@SensorPoints"

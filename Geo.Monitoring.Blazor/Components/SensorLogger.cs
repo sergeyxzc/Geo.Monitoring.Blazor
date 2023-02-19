@@ -18,6 +18,7 @@ namespace Geo.Monitoring.Blazor.Components
         public string Type => _sensor.Type.ToString("G");
         public string MinLimit => _sensor.MinLimit.HasValue ? _sensor.MinLimit.Value.ToString("N") : "N/A";
         public string MaxLimit => _sensor.MaxLimit.HasValue ? _sensor.MaxLimit.Value.ToString("N") : "N/A";
+        public string LastValue => _sensor.LastValue.ToString("N");
     }
 
     public partial class SensorLogger
