@@ -8,28 +8,33 @@
 else
 {
     <div class="h5 d-flex flex-column text-muted">
-        <p>Company information</p>
+        <p>Company</p>
     </div>
     <hr class="text-dark" />
 
     <DxFormLayout CssClass="w-50">
-        <DxFormLayoutItem Caption="Name:" ColSpanMd="12">
-            <DxTextBox @bind-Text="@CompanyDetails.Name" ReadOnly="true" />
-        </DxFormLayoutItem>
-        <DxFormLayoutItem Caption="Country:" ColSpanMd="12">
-            <DxTextBox @bind-Text="@CompanyDetails.Address.Country" ReadOnly="true" />
-        </DxFormLayoutItem>
-        <DxFormLayoutItem Caption="Region:" ColSpanMd="12">
-            <DxTextBox @bind-Text="@CompanyDetails.Address.Region" ReadOnly="true" />
-        </DxFormLayoutItem>
-        <DxFormLayoutItem Caption="City:" ColSpanMd="12">
-            <DxTextBox @bind-Text="@CompanyDetails.Address.City" ReadOnly="true" />
-        </DxFormLayoutItem>
-        <DxFormLayoutItem Caption="Address:" ColSpanMd="12">
-            <DxTextBox @bind-Text="@CompanyDetails.Address.AddressLine" ReadOnly="true" />
-        </DxFormLayoutItem>
-        <DxFormLayoutItem Caption="Postal code:" ColSpanMd="12">
-            <DxTextBox @bind-Text="@CompanyDetails.Address.PostalCode" ReadOnly="true" />
-        </DxFormLayoutItem>
+        <DxFormLayoutGroup Caption="Information" ColSpanMd="12">
+            <DxFormLayoutItem Caption="Name:" ColSpanMd="12">
+                <DxTextBox @bind-Text="@CompanyDetails.Name" ReadOnly="true" />
+            </DxFormLayoutItem>
+        </DxFormLayoutGroup>
+
+        <DxFormLayoutGroup Caption="Address" ColSpanMd="12">
+            <DxFormLayoutItem Caption="Country:" ColSpanMd="12">
+                <DxTextBox @bind-Text="@CompanyDetails.Address.Country" ReadOnly="true"/>
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Region:" ColSpanMd="12">
+                <DxTextBox @bind-Text="@CompanyDetails.Address.Region" ReadOnly="true"/>
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="City:" ColSpanMd="12">
+                <DxTextBox @bind-Text="@CompanyDetails.Address.City" ReadOnly="true"/>
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Address:" ColSpanMd="12">
+                <DxTextBox @bind-Text="@CompanyDetails.Address.AddressLine" ReadOnly="true"/>
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Postal code:" ColSpanMd="12">
+                <DxTextBox @bind-Text="@CompanyDetails.Address.PostalCode" ReadOnly="true"/>
+            </DxFormLayoutItem>
+        </DxFormLayoutGroup>
     </DxFormLayout>
 }
