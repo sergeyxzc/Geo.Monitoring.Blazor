@@ -2,7 +2,7 @@
 
 namespace Geo.Monitoring.Blazor.Components.Common;
 
-public abstract class ApplicationComponentBase : ComponentBase, IDisposable
+public abstract class BaseApplicationComponent : ComponentBase, IDisposable
 {
     private CancellationTokenSource _cancellationTokenSource;
 

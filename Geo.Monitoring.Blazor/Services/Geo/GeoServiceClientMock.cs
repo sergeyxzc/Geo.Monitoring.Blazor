@@ -2,6 +2,8 @@
 
 public class GeoServiceClientMock : IGeoServiceClient
 {
+    private static readonly int CompanyId = 7788;
+    private static readonly int EmployeeId = 4455;
     private readonly SensorLogger[] _loggers;
 
     public GeoServiceClientMock()
@@ -33,6 +35,34 @@ public class GeoServiceClientMock : IGeoServiceClient
                 };
             })
             .ToArray();
+    }
+
+    public Task<LoginResponse> LoginAsync(LoginRequest request, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(new LoginResponse()
+        {
+            CompanyId = CompanyId,
+            EmployeeId = EmployeeId,
+            ErrorMessage = "",
+            Successes = true
+        });
+    }
+
+    public Task<CompanyDetails> GetCompanyInfoAsync(CancellationToken cancellationToken)
+    {
+        return Task.FromResult(new CompanyDetails()
+        {
+            Id = CompanyId,
+            Name = "Viola Group",
+            Address = new Address()
+            {
+                Country = "Russia",
+                City = "Nadym",
+                AddressLine = "Lenin Street 1",
+                PostalCode = "223344",
+                Region = "Siberia"
+            }
+        });
     }
 
     public async Task<GetLoggersResponse> GetLoggersAsync(CancellationToken cancellationToken)

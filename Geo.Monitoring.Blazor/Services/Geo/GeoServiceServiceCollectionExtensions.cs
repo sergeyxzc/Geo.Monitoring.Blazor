@@ -24,6 +24,8 @@ public static class GeoServiceServiceCollectionExtensions
         Action<HttpClient, GeoServiceOptions> afterConfigure = null,
         Action<IHttpClientBuilder> httpClientConfigure = null)
     {
+        services.AddScoped<GeoAuthHeaderHandler>();
+
         var httpClientBuilder = services.AddRefitClient<IGeoServiceClient>(settingsAction)
             .ConfigureHttpClient((sp, httpClient) =>
             {
@@ -39,7 +41,8 @@ public static class GeoServiceServiceCollectionExtensions
                 }
 
                 afterConfigure?.Invoke(httpClient, options);
-            });
+            })
+            .AddHttpMessageHandler<GeoAuthHeaderHandler>(); ;
 
         httpClientConfigure?.Invoke(httpClientBuilder);
 

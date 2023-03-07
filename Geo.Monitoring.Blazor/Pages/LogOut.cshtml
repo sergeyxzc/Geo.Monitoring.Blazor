@@ -1,15 +1,11 @@
 ﻿@page
 @using Geo.Monitoring.Blazor.Services
 @attribute [IgnoreAntiforgeryToken]
-@inject IIdentityUserService IdeIdentityUserService 
+@inject ILoginUserService LoginUserService
 @functions {
     public async Task<IActionResult> OnPost()
     {
-        if (IdeIdentityUserService.IsSignedIn(User))
-        {
-            await IdeIdentityUserService.SignOutAsync();
-        }
-
+        await LoginUserService.SignOutAsync();
         return Redirect("~/");
     }
 }

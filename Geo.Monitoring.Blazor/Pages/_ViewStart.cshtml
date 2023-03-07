@@ -1,8 +1,7 @@
 ﻿@using Geo.Monitoring.Blazor.Services
-@inject IIdentityUserService IdentityUserService
 
 @{
-    if (!IdentityUserService.IsSignedIn(Context.User))
+    if (!Context.User.IsSignedIn())
     {
         Layout = "Shared/_Layout";
     }

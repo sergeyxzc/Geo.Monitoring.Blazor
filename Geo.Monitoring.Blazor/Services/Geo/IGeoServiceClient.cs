@@ -1,8 +1,21 @@
-﻿using System.Runtime.InteropServices.JavaScript;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using Refit;
 
 namespace Geo.Monitoring.Blazor.Services.Geo;
+
+public class LoginRequest
+{
+    public string LoginName { get; set; }
+    public string Password { get; set; }
+}
+
+public class LoginResponse
+{
+    public bool Successes { get; set; }
+    public string ErrorMessage { get; set; }
+    public int EmployeeId { get; set; }
+    public int CompanyId { get; set; }
+}
 
 public enum SensorType
 {
@@ -77,8 +90,30 @@ public class GetLoggersResponse
     public IReadOnlyList<SensorLoggerDesc> Loggers { get; set; }
 }
 
+public class CompanyDetails
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public Address Address { get; set; }
+}
+
+public class Address
+{
+    public string Country { get; set; }
+    public string City { get; set; }
+    public string Region { get; set; }
+    public string PostalCode { get; set; }
+    public string AddressLine { get; set; }
+}
+
 public interface IGeoServiceClient
 {
+    [Post("/api/v1/login")]
+    Task<LoginResponse> LoginAsync([Body(BodySerializationMethod.Serialized)] LoginRequest request, CancellationToken cancellationToken);
+
+    [Get("/api/v1/company")]
+    Task<CompanyDetails> GetCompanyInfoAsync(CancellationToken cancellationToken);
+
     [Get("/api/v1/logger")]
     Task<GetLoggersResponse> GetLoggersAsync(CancellationToken cancellationToken);
 
