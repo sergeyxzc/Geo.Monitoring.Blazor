@@ -3,24 +3,23 @@ using Microsoft.AspNetCore.Components.Server;
 
 namespace Geo.Monitoring.Blazor.Services;
 
-public class RevalidatingIdentityAuthenticationStateProvider
-    : RevalidatingServerAuthenticationStateProvider
+public class ReValidatingIdentityAuthenticationStateProvider : RevalidatingServerAuthenticationStateProvider
 {
-    private readonly IIdentityUserService _identityUserService;
+    //private readonly ILoginUserService _loginUserService;
 
-    public RevalidatingIdentityAuthenticationStateProvider(
-        IIdentityUserService identityUserService,
+    public ReValidatingIdentityAuthenticationStateProvider(
+        //ILoginUserService loginUserService,
         ILoggerFactory loggerFactory)
         : base(loggerFactory)
     {
-        _identityUserService = identityUserService;
+        //_loginUserService = loginUserService;
     }
 
     protected override TimeSpan RevalidationInterval => TimeSpan.FromMinutes(30);
 
     protected override async Task<bool> ValidateAuthenticationStateAsync(AuthenticationState authenticationState, CancellationToken cancellationToken)
     {
-        var res = await _identityUserService.ValidateAuthenticationStateAsync(authenticationState.User);
-        return res;
+        //var res = await _loginUserService.ValidateAuthenticationStateAsync(authenticationState.User, cancellationToken);
+        return true;
     }
 }
