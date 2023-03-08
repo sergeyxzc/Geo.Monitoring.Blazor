@@ -20,8 +20,8 @@ public class GeoAuthHeaderHandler : DelegatingHandler
         {
             var companyClaim = GeoUserPrincipalClaims.FindCompanyClaim(authenticationState.User.Claims);
             var employeeClaim = GeoUserPrincipalClaims.FindEmployeeClaim(authenticationState.User.Claims);
-            request.Headers.Add("Geo-Company-Id", companyClaim?.Value ?? string.Empty);
-            request.Headers.Add("Geo-Employee-Id", employeeClaim?.Value ?? string.Empty);
+            request.Headers.Add("X-Geo-Company-Id", companyClaim?.Value ?? string.Empty);
+            request.Headers.Add("X-Geo-Employee-Id", employeeClaim?.Value ?? string.Empty);
         }
 
         return await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
