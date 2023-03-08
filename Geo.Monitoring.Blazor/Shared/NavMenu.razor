@@ -1,4 +1,8 @@
-﻿@*<div class="sidebar @StateCssClass">
+﻿@using Geo.Monitoring.Blazor.Services
+@using Geo.Monitoring.Blazor.Services.Geo
+@inherits Geo.Monitoring.Blazor.Components.Common.BaseApplicationComponent
+
+@*<div class="sidebar @StateCssClass">
     <DxTreeView AllowSelectNodes="true" CssClass="app-sidebar">
         <Nodes>
             <DxTreeViewNode NavigateUrl="dashboard" Text="Dashboard"></DxTreeViewNode>
@@ -14,9 +18,11 @@
 @*nav-scrollable*@
 <div class="sidebar @StateCssClass">
     <nav class="flex-column">
-        <div class="title justify-content-center px-3 py-3">
-            <p class="text-uppercase fw-normal h4 text-light bg-transparent">geo monitoring</p>
+        <div class="title justify-content-center px-3 pt-3">
+            <p class="text-uppercase fw-normal h4 text-light bg-transparent">@CompanyName</p>
         </div>
+        
+        <hr class="text-white-50" />
 
         <div class="nav-item pt-3 px-3">
             <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">
@@ -42,19 +48,32 @@
     </nav>
 </div>
 
-@code {
-    [Parameter] public string StateCssClass 
-    { 
-        get; 
-        set;
-    }
-    
-    private bool collapseNavMenu = true;
+@code 
+{
+    [Inject]  public IUserService UserService { get; set; }
+    [Inject] public IGeoServiceClient GeoService { get; set; }
 
-    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    [Parameter] public string StateCssClass { get; set; }
+    private bool _collapseNavMenu = true;
+    private string NavMenuCssClass => _collapseNavMenu ? "collapse" : null;
+    private string CompanyName { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var info = await GeoService.GetCompanyInfoAsync(ComponentCancellationToken);
+            CompanyName = info.BrandName;
+        }
+        catch
+        {
+            // ignored
+        }
+    }
+
 
     private void ToggleNavMenu()
     {
-        collapseNavMenu = !collapseNavMenu;
+        _collapseNavMenu = !_collapseNavMenu;
     }
 }

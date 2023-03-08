@@ -39,6 +39,7 @@ public class GeoServiceClientMock : IGeoServiceClient
         public List<ProjectMock> Projects { get; } = new();
         public List<EmployeeMock> Employees { get; } = new();
         public string Name { get; set; }
+        public string BrandName { get; set; } = "Viola company";
 
         public Address Address { get; set; } = new Address()
         {
@@ -248,6 +249,7 @@ public class GeoServiceClientMock : IGeoServiceClient
         {
             Id = loggedEmployee.Company.Id,
             Name = loggedEmployee.Company.Name,
+            BrandName = loggedEmployee.Company.BrandName,
             Address = loggedEmployee.Company.Address
         };
     }
