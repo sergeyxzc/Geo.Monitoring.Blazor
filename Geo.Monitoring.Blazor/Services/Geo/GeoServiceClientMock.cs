@@ -1,121 +1,368 @@
-﻿namespace Geo.Monitoring.Blazor.Services.Geo;
+﻿using System.ComponentModel.Design;
+
+namespace Geo.Monitoring.Blazor.Services.Geo;
 
 public class GeoServiceClientMock : IGeoServiceClient
 {
-    private static readonly int CompanyId = 7788;
-    private static readonly int EmployeeId = 4455;
-    private readonly SensorLogger[] _loggers;
+    private static Random R = new();
+    private static volatile int IdCount = 1;
+    private static int GetNextId() => Interlocked.Increment(ref IdCount);
+
+    private class CompanyMock
+    {
+        public static CompanyMock Gen(int i)
+        {
+            var company = new CompanyMock(GetNextId(), $"Company-{i}");
+
+            foreach (var k in Enumerable.Range(1, 10))
+            {
+                company.CreateEmployee($"co-{i}-lo-{k}@tmail.com");
+            }
+
+            foreach (var k in Enumerable.Range(1, 10))
+            {
+                var p = company.CreateProject($"co-{i}-project-{k}");
+                p.GenLoggers();
+            }
+
+            return company;
+        }
+
+        public CompanyMock(int id, string name)
+        {
+            Id = id;
+            Name = name;
+            Employees.Add(new EmployeeMock(GetNextId(), this, "cadmin"));
+            Employees.Add(new EmployeeMock(GetNextId(), this, "yadmin"));
+        }
+
+        public int Id { get; }
+        public List<ProjectMock> Projects { get; } = new();
+        public List<EmployeeMock> Employees { get; } = new();
+        public string Name { get; set; }
+
+        public Address Address { get; set; } = new Address()
+        {
+            Country = "Russia",
+            City = "Nadym",
+            AddressLine = "Lenin Street 1",
+            PostalCode = "223344",
+            Region = "Siberia"
+        };
+
+        public ProjectMock CreateProject(string name)
+        {
+            var p = new ProjectMock(GetNextId(), this)
+            {
+                Name = name
+            };
+            Projects.Add(p);
+            return p;
+        }
+
+        public EmployeeMock CreateEmployee(string login)
+        {
+            var e = new EmployeeMock(GetNextId(), this, login)
+            {
+                FirstName = login,
+                LastName = login,
+                MiddleName = login
+            };
+            Employees.Add(e);
+            return e;
+        }
+    }
+
+    private class ProjectMock
+    {
+        public ProjectMock(int id, CompanyMock company)
+        {
+            Id = id;
+            Company = company;
+        }
+
+        public void GenLoggers()
+        {
+            Loggers.AddRange(Enumerable.Range(1, 10).Select(i =>
+            {
+                var logger = new LoggerMock(GetNextId(), $"Logger-{i}");
+                logger.GenSensors();
+                return logger;
+            }));
+        }
+
+        public int Id { get; }
+        public CompanyMock Company { get; }
+        public string Name { get; set; }
+        public List<int> Employees { get; } = new();
+        public List<LoggerMock> Loggers { get; } = new();
+
+        public void AddEmployee(int employeeId)
+        {
+            var emp = Company.Employees.Find(e => e.Id == employeeId);
+            if (Employees.All(e => e != employeeId))
+                throw new ArgumentException("Already added");
+            Employees.Add(emp.Id);
+        }
+    }
+
+    private class EmployeeMock
+    {
+        public EmployeeMock(int id, CompanyMock company, string login)
+        {
+            Id = id;
+            Company = company;
+            Login = login;
+        }
+
+        public int Id { get; }
+        public CompanyMock Company { get; }
+        public string Login { get; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string MiddleName { get; set; }
+        public DateOnly? BirthDate { get; set; }
+    }
+
+    private class LoggerMock
+    {
+        public LoggerMock(int id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
+
+        public int Id { get; }
+        public string Name { get; set; }
+        public GeoPoint Position { get; set; } = new GeoPoint() { Latitude = 30, Longitude = 60 };
+        public List<SensorMock> Sensors { get; } = new();
+
+        public void GenSensors()
+        {
+            Sensors
+                .AddRange(Enumerable.Range(1, 30)
+                .Select(i =>
+                {
+                    var st = R.Next(2) == 0 ? SensorType.Pressure : SensorType.Gyroscope;
+                    var s = new SensorMock(GetNextId(), st);
+                    s.GenValues();
+                    return s;
+                })
+            );
+        }
+    }
+
+    private class SensorMock
+    {
+        public SensorMock(int id, SensorType type)
+        {
+            Id = id;
+            Type = type;
+        }
+        public int Id { get; }
+        public SensorType Type { get; set; }
+        public double MaxLimit { get; set; } = R.Next(50, 100);
+        public double MinLimit { get; set; } = R.Next(10, 40);
+        public string SensorKey { get; set; } = $"key-{GetNextId()}";
+        public List<SensorValue> Values { get; } = new();
+
+        public void GenValues()
+        {
+            var start = /*request.From ?? */DateTime.UtcNow.AddYears(-1);
+            var end = /*request.To ?? */DateTime.UtcNow;
+
+            if (start > end)
+                start = end;
+
+            var step = (end - start).TotalHours / 1000;
+
+            var values = Enumerable.Range(1, 500).Select(i =>
+            {
+                var sp = new SensorValue()
+                {
+                    Timestamp = start.AddHours(step),
+                    Value = R.NextDouble() * 100.0
+                };
+                start = sp.Timestamp;
+                return sp;
+            }).ToArray();
+
+            Values.AddRange(values);
+        }
+    }
+
+    public class SensorValue
+    {
+        public double Value { get; set; }
+        public DateTime Timestamp { get; set; }
+    }
+
+    private readonly List<CompanyMock> _companies = new();
+    private EmployeeMock _loggedEmployeeMock;
 
     public GeoServiceClientMock()
     {
-        var r = new Random();
-
-        _loggers = Enumerable.Range(1, 10)
-            .Select(i =>
-            {
-                var sensors = Enumerable.Range(1, 20)
-                    .Select(s => new SensorDesc()
-                    {
-                        Id = s,
-                        Type = r.Next(2) == 0 ? SensorType.Pressure : SensorType.Gyroscope,
-                        MaxLimit = r.Next(50, 100),
-                        MinLimit = r.Next(10, 40)
-                    })
-                    .ToArray();
-
-                return new SensorLogger()
-                {
-                    Logger = new SensorLoggerDesc()
-                    {
-                        Id = i,
-                        Name = $"Logger-{i}",
-                        SensorCount = sensors.Length
-                    },
-                    Sensors = sensors
-                };
-            })
-            .ToArray();
+        _companies.AddRange(Enumerable.Range(1, 3).Select(CompanyMock.Gen));
     }
 
-    public Task<LoginResponse> LoginAsync(LoginRequest request, CancellationToken cancellationToken)
+
+    public async Task<LoginResponse> LoginAsync(LoginRequest request, CancellationToken cancellationToken)
     {
-        return Task.FromResult(new LoginResponse()
+        var employee = _companies.SelectMany(x => x.Employees).SingleOrDefault(x => x.Login == request.LoginName);
+
+        if (employee == null)
         {
-            CompanyId = CompanyId,
-            EmployeeId = EmployeeId,
+            return new LoginResponse()
+            {
+                ErrorMessage = "Not found employee",
+                Successes = false
+            };
+        }
+
+        _loggedEmployeeMock = employee;
+
+        return new LoginResponse()
+        {
+            CompanyId = employee.Company.Id,
+            EmployeeId = employee.Id,
             ErrorMessage = "",
             Successes = true
-        });
+        };
     }
 
-    public Task<CompanyDetails> GetCompanyInfoAsync(CancellationToken cancellationToken)
+    public async Task<CompanyDetails> GetCompanyInfoAsync(CancellationToken cancellationToken)
     {
-        return Task.FromResult(new CompanyDetails()
+        return new CompanyDetails()
         {
-            Id = CompanyId,
-            Name = "Viola Group",
-            Address = new Address()
-            {
-                Country = "Russia",
-                City = "Nadym",
-                AddressLine = "Lenin Street 1",
-                PostalCode = "223344",
-                Region = "Siberia"
-            }
-        });
+            Id = _loggedEmployeeMock.Company.Id,
+            Name = _loggedEmployeeMock.Company.Name,
+            Address = _loggedEmployeeMock.Company.Address
+        };
     }
 
-    public async Task<GetLoggersResponse> GetLoggersAsync(CancellationToken cancellationToken)
+    public async Task<GetCompanyEmployeesResponse> GetCompanyEmployeesAsync(CancellationToken cancellationToken)
     {
-        await Task.Delay(1000, cancellationToken);
-        return new GetLoggersResponse()
+        return new GetCompanyEmployeesResponse()
         {
-            Loggers = _loggers.Select(x => new SensorLoggerDesc()
+            Employees = _loggedEmployeeMock.Company.Employees.Select(x => new EmployeeDesc()
             {
-                Id = x.Logger.Id,
-                Name = x.Logger.Name,
-                SensorCount = x.Sensors?.Count ?? 0,
+                Id = x.Id,
+                BirthDate = x.BirthDate,
+                FirstName = x.FirstName,
+                LastName = x.LastName,
+                MiddleName = x.MiddleName,
+                IsBeneficiary = false
             }).ToArray()
         };
     }
 
-    public async Task<SensorLogger> GetLoggerAsync(int id, CancellationToken cancellationToken)
+    public async Task<GetCompanyProjectsResponse> GetCompanyProjectsAsync(CancellationToken cancellationToken)
     {
-        await Task.Delay(1000, cancellationToken);
-        return _loggers.First(x => x.Logger.Id == id);
-    }
-
-    public async Task<IReadOnlyList<SensorPoint>> GetSensorValuesAsync(int id, CancellationToken cancellationToken)
-    {
-        await Task.Delay(1000, cancellationToken);
-
-        var start = /*request.From ?? */DateTime.UtcNow.AddYears(-1);
-        var end = /*request.To ?? */DateTime.UtcNow;
-
-        if (start > end)
-            start = end;
-
-        var step = (end - start).TotalHours / 500;
-
-        var r = new Random();
-
-        var result = Enumerable.Range(1, 500).Select(i =>
+        return new GetCompanyProjectsResponse()
         {
-            var sp = new SensorPoint()
+            Projects = _loggedEmployeeMock.Company.Projects.Select(x => new CompanyProjectDesc()
             {
-                Timestamp = start.AddHours(step),
-                Value = r.NextDouble() * 100.0
-            };
-            start = sp.Timestamp;
-            return sp;
-        }).ToArray();
-
-        return result;
+                Id = x.Id,
+                Name = x.Name,
+                EmployeeCount = x.Employees.Count
+            }).ToArray()
+        };
     }
 
-    public async Task<SensorDesc> GetSensorAsync(int id, CancellationToken cancellationToken)
+    public async Task<GetProjectResponse> GetProjectAsync(int id, CancellationToken cancellationToken)
     {
-        await Task.Delay(1000, cancellationToken);
-        return _loggers.SelectMany(x => x.Sensors).First(x => x.Id == id);
+        var p = _loggedEmployeeMock.Company.Projects.Single(x => x.Id == id);
+        //var employees = _loggedEmployeeMock.Company.Employees.ToDictionary(x => x.Id);
+
+        return new GetProjectResponse()
+        {
+            Project = new CompanyProjectDesc()
+            {
+                Id = p.Id,
+                Name = p.Name,
+                EmployeeCount = p.Employees.Count
+            },
+
+            Employees = p.Employees.Select(x => new ProjectEmployee
+            {
+                EmployeeId = x,
+                ProjectId = p.Id
+            }).ToArray(),
+
+            Loggers = p.Loggers.Select(x => new LoggerDesc
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Position = x.Position,
+                Sensors = x.Sensors.Select(s =>
+                {
+                    var last = s.Values.Last();
+
+                    return new SensorDesc()
+                    {
+                        Id = s.Id,
+                        LastValue = last.Value,
+                        MaxLimit = s.MaxLimit,
+                        MinLimit = s.MinLimit,
+                        SensorKey = s.SensorKey,
+                        Type = s.Type,
+                        UpdateTimestamp = last.Timestamp
+                    };
+                }).ToArray()
+            }).ToArray()
+            //Employees = p.Employees.Select(employeeId =>
+            //{
+            //    var e = employees[employeeId];
+            //    return new EmployeeDesc()
+            //    {
+            //        Id = e.Id,
+            //        BirthDate = e.BirthDate,
+            //        FirstName = e.FirstName,
+            //        LastName = e.LastName,
+            //        MiddleName = e.MiddleName,
+            //        IsBeneficiary = false
+            //    };
+            //}).ToArray(),
+
+        };
+    }
+
+    public async Task<CreateProjectResponse> CreateProjectAsync(CreateProjectRequest request, CancellationToken cancellationToken)
+    {
+        var proj = _loggedEmployeeMock.Company.CreateProject(request.Name);
+        return new CreateProjectResponse() { Id = proj.Id };
+    }
+
+    public async Task<UpdateProjectResponse> UpdateProjectAsync(int id, UpdateProjectRequest request, CancellationToken cancellationToken)
+    {
+        var p = _loggedEmployeeMock.Company.Projects.First(x => x.Id == id);
+        p.Name = request.Name;
+        return new UpdateProjectResponse() { Id = p.Id };
+    }
+
+    public async Task<ProjectEmployee> AddProjectEmployeeAsync(int id, AddProjectEmployeeRequest request, CancellationToken cancellationToken)
+    {
+        var p = _loggedEmployeeMock.Company.Projects.First(x => x.Id == id);
+        p.AddEmployee(request.EmployeeId);
+        return new ProjectEmployee()
+        {
+            EmployeeId = request.EmployeeId,
+            ProjectId = p.Id
+        };
+    }
+
+    public Task<LoggerDesc> GetLoggerAsync(int id, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<SensorDesc> GetSensorAsync(int id, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<IReadOnlyList<SensorPoint>> GetSensorValuesAsync(int id, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
     }
 }

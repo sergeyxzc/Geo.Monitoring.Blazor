@@ -32,6 +32,7 @@ public class SensorPoint
     [JsonPropertyName("timeStamp")]
     [JsonConverter(typeof(GeoTimeConverter))]
     public DateTime Timestamp { get; set; }
+    public GeoPoint Position { get; set; }
 }
 
 public class SensorValuesRequest
@@ -64,17 +65,11 @@ public class SensorDesc
     public DateTime UpdateTimestamp { get; set; }
 }
 
-public class SensorLoggerDesc
+public class LoggerDesc
 {
     public int Id { get; set; }
     public string Name { get; set; }
-    public int SensorCount { get; set; }
-    //public IReadOnlyList<SensorDesc> Sensors { get; set; }
-}
-
-public class SensorLogger
-{
-    public SensorLoggerDesc Logger { get; set; }
+    public GeoPoint Position { get; set; }
     public IReadOnlyList<SensorDesc> Sensors { get; set; }
 }
 
@@ -85,10 +80,10 @@ public class UpdateSensorLimitsRequest
     public double? MaxLimit { get; set; }
 }
 
-public class GetLoggersResponse
-{
-    public IReadOnlyList<SensorLoggerDesc> Loggers { get; set; }
-}
+//public class GetLoggersResponse
+//{
+//    public IReadOnlyList<SensorLoggerDesc> Loggers { get; set; }
+//}
 
 public class CompanyDetails
 {
@@ -106,6 +101,78 @@ public class Address
     public string AddressLine { get; set; }
 }
 
+public class CompanyProjectDesc
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public int EmployeeCount { get; set; }
+}
+
+public class GeoPoint
+{
+    public double Latitude { get; set; }
+    public double Longitude { get; set; }     
+}
+
+public class GetCompanyProjectsResponse
+{
+    public IReadOnlyList<CompanyProjectDesc>  Projects { get; set; }
+}
+
+public class ProjectEmployee
+{
+    public int ProjectId { get; set; }
+    public int EmployeeId { get; set; }
+}
+
+public class GetProjectResponse
+{
+    public CompanyProjectDesc Project { get; set; }
+    public IReadOnlyList<LoggerDesc> Loggers { get; set; }
+    public IReadOnlyList<ProjectEmployee> Employees { get; set; }
+}
+
+public class CreateProjectResponse
+{
+    public int Id { get; set; }
+}
+
+public class CreateProjectRequest
+{
+    public string Name { get; set; }
+}
+
+public class UpdateProjectRequest
+{
+    public string Name { get; set; }
+}
+
+public class UpdateProjectResponse
+{
+    public int Id { get; set; }
+}
+
+public class GetCompanyEmployeesResponse
+{
+    public IReadOnlyList<EmployeeDesc> Employees { get; set; }
+}
+
+public class EmployeeDesc
+{
+    public int Id { get; set; }
+    public int EmployeeRoleId { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string MiddleName { get; set; }
+    public DateOnly? BirthDate { get; set; }
+    public bool IsBeneficiary { get; set; }
+}
+
+public class AddProjectEmployeeRequest
+{
+    public int EmployeeId { get; set; }
+}
+
 public interface IGeoServiceClient
 {
     [Post("/api/v1/login")]
@@ -114,15 +181,39 @@ public interface IGeoServiceClient
     [Get("/api/v1/company")]
     Task<CompanyDetails> GetCompanyInfoAsync(CancellationToken cancellationToken);
 
-    [Get("/api/v1/logger")]
-    Task<GetLoggersResponse> GetLoggersAsync(CancellationToken cancellationToken);
+    [Get("/api/v1/company/employee/list")]
+    Task<GetCompanyEmployeesResponse> GetCompanyEmployeesAsync(CancellationToken cancellationToken);
 
-    [Get("/api/v1/logger/{id}")]
-    Task<SensorLogger> GetLoggerAsync([Query] int id, CancellationToken cancellationToken);
+    [Get("/api/v1/company/project/list")]
+    Task<GetCompanyProjectsResponse> GetCompanyProjectsAsync(CancellationToken cancellationToken);
 
-    [Get("/api/v1/sensor/{id}")]
+    [Get("/api/v1/company/project/{id}")]
+    Task<GetProjectResponse> GetProjectAsync([Query] int id, CancellationToken cancellationToken);
+
+    [Post("/api/v1/company/project")]
+    Task<CreateProjectResponse> CreateProjectAsync(
+        [Body(BodySerializationMethod.Serialized)] CreateProjectRequest request, 
+        CancellationToken cancellationToken);
+
+    [Post("/api/v1/company/project/{id}")]
+    Task<UpdateProjectResponse> UpdateProjectAsync([Query] int id, 
+        [Body(BodySerializationMethod.Serialized)] UpdateProjectRequest request, 
+        CancellationToken cancellationToken);
+
+    [Post("/api/v1/company/project/{id}/employee")]
+    Task<ProjectEmployee> AddProjectEmployeeAsync([Query] int id,
+        [Body(BodySerializationMethod.Serialized)] AddProjectEmployeeRequest request,
+        CancellationToken cancellationToken);
+
+    //[Get("/api/v1/company/project/{projectId}/logger/list")]
+    //Task<GetLoggersResponse> GetLoggersAsync([Query] CancellationToken cancellationToken);
+
+    [Get("/api/v1/company/logger/{id}")]
+    Task<LoggerDesc> GetLoggerAsync([Query] int id, CancellationToken cancellationToken);
+
+    [Get("/api/v1/company/sensor/{id}")]
     Task<SensorDesc> GetSensorAsync([Query] int id, CancellationToken cancellationToken);
 
-    [Get("/api/v1/sensor/{id}/values")]
+    [Get("/api/v1/company/sensor/{id}/values")]
     Task<IReadOnlyList<SensorPoint>> GetSensorValuesAsync([Query] int id, CancellationToken cancellationToken);
 }

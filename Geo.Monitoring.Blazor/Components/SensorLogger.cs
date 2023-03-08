@@ -40,7 +40,7 @@ public partial class SensorLogger
             Busy = true;
             var logger = await GeoService.GetLoggerAsync(LoggerId, ComponentCancellationToken);
             Sensors = logger.Sensors.Select(x => new SensorViewModel(x)).ToList();
-            LoggerName = logger.Logger.Name;
+            //LoggerName = logger.Logger.Name;
         }
         finally
         {

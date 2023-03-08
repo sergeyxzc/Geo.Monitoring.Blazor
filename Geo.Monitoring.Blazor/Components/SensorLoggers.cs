@@ -6,16 +6,16 @@ namespace Geo.Monitoring.Blazor.Components
 {
     public class GeoLoggerViewModel
     {
-        private readonly Services.Geo.SensorLoggerDesc _logger;
+        //private readonly Services.Geo.SensorLoggerDesc _logger;
 
-        public GeoLoggerViewModel(Services.Geo.SensorLoggerDesc logger)
+        public GeoLoggerViewModel(/*Services.Geo.SensorLoggerDesc logger*/)
         {
-            _logger = logger;
-            Sensors = logger?.SensorCount ?? 0;
+            //_logger = logger;
+            //Sensors = logger?.SensorCount ?? 0;
         }
 
-        public int Id => _logger.Id;
-        public string Name => _logger.Name;
+        public int Id => 1;//_logger.Id;
+        public string Name => "";//_logger.Name;
         public int Sensors { get; }
     }
 
@@ -32,8 +32,8 @@ namespace Geo.Monitoring.Blazor.Components
             try
             {
                 Busy = true;
-                var loggers = await GeoService.GetLoggersAsync(ComponentCancellationToken);
-                GeoLoggers = loggers?.Loggers?.Select(x => new GeoLoggerViewModel(x)).ToList();
+                //var loggers = await GeoService.GetLoggersAsync(ComponentCancellationToken);
+                //GeoLoggers = loggers?.Loggers?.Select(x => new GeoLoggerViewModel(x)).ToList();
             }
             finally
             {
