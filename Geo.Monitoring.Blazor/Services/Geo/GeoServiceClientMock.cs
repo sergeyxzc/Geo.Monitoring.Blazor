@@ -1,9 +1,8 @@
-﻿using System.ComponentModel.Design;
-
-namespace Geo.Monitoring.Blazor.Services.Geo;
+﻿namespace Geo.Monitoring.Blazor.Services.Geo;
 
 public class GeoServiceClientMock : IGeoServiceClient
 {
+    private readonly IUserService _userService;
     private static Random R = new();
     private static volatile int IdCount = 1;
     private static int GetNextId() => Interlocked.Increment(ref IdCount);
@@ -197,14 +196,28 @@ public class GeoServiceClientMock : IGeoServiceClient
         public DateTime Timestamp { get; set; }
     }
 
-    private readonly List<CompanyMock> _companies = new();
-    private EmployeeMock _loggedEmployeeMock;
+    private static readonly List<CompanyMock> _companies = new();
 
-    public GeoServiceClientMock()
+    public GeoServiceClientMock(IUserService userService)
     {
-        _companies.AddRange(Enumerable.Range(1, 3).Select(CompanyMock.Gen));
+        _userService = userService;
+
+        if (_companies is { Count: 0 })
+        {
+            _companies.AddRange(Enumerable.Range(1, 3).Select(CompanyMock.Gen));
+        }
     }
 
+    private async Task<EmployeeMock> GetLoggedEmployeeAsync()
+    {
+        var user = await _userService.GetUserContextAsync(CancellationToken.None);
+        var employee = _companies
+            .SelectMany(x => x.Employees)
+            .SingleOrDefault(x => 
+                x.Id == int.Parse(user.EmployeeId) && 
+                x.Company.Id == int.Parse(user.CompanyId));
+        return employee;
+    }
 
     public async Task<LoginResponse> LoginAsync(LoginRequest request, CancellationToken cancellationToken)
     {
@@ -219,8 +232,6 @@ public class GeoServiceClientMock : IGeoServiceClient
             };
         }
 
-        _loggedEmployeeMock = employee;
-
         return new LoginResponse()
         {
             CompanyId = employee.Company.Id,
@@ -232,19 +243,21 @@ public class GeoServiceClientMock : IGeoServiceClient
 
     public async Task<CompanyDetails> GetCompanyInfoAsync(CancellationToken cancellationToken)
     {
+        var loggedEmployee = await GetLoggedEmployeeAsync();
         return new CompanyDetails()
         {
-            Id = _loggedEmployeeMock.Company.Id,
-            Name = _loggedEmployeeMock.Company.Name,
-            Address = _loggedEmployeeMock.Company.Address
+            Id = loggedEmployee.Company.Id,
+            Name = loggedEmployee.Company.Name,
+            Address = loggedEmployee.Company.Address
         };
     }
 
     public async Task<GetCompanyEmployeesResponse> GetCompanyEmployeesAsync(CancellationToken cancellationToken)
     {
+        var loggedEmployee = await GetLoggedEmployeeAsync();
         return new GetCompanyEmployeesResponse()
         {
-            Employees = _loggedEmployeeMock.Company.Employees.Select(x => new EmployeeDesc()
+            Employees = loggedEmployee.Company.Employees.Select(x => new EmployeeDesc()
             {
                 Id = x.Id,
                 BirthDate = x.BirthDate,
@@ -258,9 +271,10 @@ public class GeoServiceClientMock : IGeoServiceClient
 
     public async Task<GetCompanyProjectsResponse> GetCompanyProjectsAsync(CancellationToken cancellationToken)
     {
+        var loggedEmployee = await GetLoggedEmployeeAsync();
         return new GetCompanyProjectsResponse()
         {
-            Projects = _loggedEmployeeMock.Company.Projects.Select(x => new CompanyProjectDesc()
+            Projects = loggedEmployee.Company.Projects.Select(x => new CompanyProjectDesc()
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -271,7 +285,8 @@ public class GeoServiceClientMock : IGeoServiceClient
 
     public async Task<GetProjectResponse> GetProjectAsync(int id, CancellationToken cancellationToken)
     {
-        var p = _loggedEmployeeMock.Company.Projects.Single(x => x.Id == id);
+        var loggedEmployee = await GetLoggedEmployeeAsync();
+        var p = loggedEmployee.Company.Projects.Single(x => x.Id == id);
         //var employees = _loggedEmployeeMock.Company.Employees.ToDictionary(x => x.Id);
 
         return new GetProjectResponse()
@@ -329,20 +344,23 @@ public class GeoServiceClientMock : IGeoServiceClient
 
     public async Task<CreateProjectResponse> CreateProjectAsync(CreateProjectRequest request, CancellationToken cancellationToken)
     {
-        var proj = _loggedEmployeeMock.Company.CreateProject(request.Name);
+        var loggedEmployee = await GetLoggedEmployeeAsync();
+        var proj = loggedEmployee.Company.CreateProject(request.Name);
         return new CreateProjectResponse() { Id = proj.Id };
     }
 
     public async Task<UpdateProjectResponse> UpdateProjectAsync(int id, UpdateProjectRequest request, CancellationToken cancellationToken)
     {
-        var p = _loggedEmployeeMock.Company.Projects.First(x => x.Id == id);
+        var loggedEmployee = await GetLoggedEmployeeAsync();
+        var p = loggedEmployee.Company.Projects.First(x => x.Id == id);
         p.Name = request.Name;
         return new UpdateProjectResponse() { Id = p.Id };
     }
 
     public async Task<ProjectEmployee> AddProjectEmployeeAsync(int id, AddProjectEmployeeRequest request, CancellationToken cancellationToken)
     {
-        var p = _loggedEmployeeMock.Company.Projects.First(x => x.Id == id);
+        var loggedEmployee = await GetLoggedEmployeeAsync();
+        var p = loggedEmployee.Company.Projects.First(x => x.Id == id);
         p.AddEmployee(request.EmployeeId);
         return new ProjectEmployee()
         {

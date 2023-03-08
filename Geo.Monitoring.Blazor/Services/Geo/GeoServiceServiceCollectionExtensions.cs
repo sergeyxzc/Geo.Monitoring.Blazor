@@ -9,7 +9,7 @@ public static class GeoServiceServiceCollectionExtensions
 {
     public static IServiceCollection AddGeoServiceClientMock(this IServiceCollection services)
     {
-        services.AddSingleton<IGeoServiceClient, GeoServiceClientMock>();
+        services.AddScoped<IGeoServiceClient, GeoServiceClientMock>();
         return services;
     }
 
