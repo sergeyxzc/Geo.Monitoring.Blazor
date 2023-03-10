@@ -1,18 +1,21 @@
 ﻿<div class="d-flex flex-fill pt-1 pb-2 w-100">
     <DxFormLayout Data="@ViewModel" CssClass="w-100">
-        <DxFormLayoutItem Field="@nameof(ViewModel.Name)" Caption="Name:" CaptionPosition="CaptionPosition.Vertical" CaptionCssClass="popup-demo-caption" CssClass="popup-demo-item" ColSpanMd="12">
+        <DxFormLayoutItem Field="@nameof(ViewModel.Name)" 
+                          Caption="Name:" 
+                          CaptionPosition="CaptionPosition.Vertical" 
+                          CaptionCssClass="popup-demo-caption" 
+                          CssClass="popup-demo-item" 
+                          ColSpanMd="12">
             <div>
-                <span></span>
                 <DxTextBox @bind-Text="@ViewModel.Name" CssClass="popup-demo-textbox" NullText="Project name" />
             </div>
         </DxFormLayoutItem>
-        <DxFormLayoutItem Field="@nameof(ViewModel.Description)" Caption="Birth Date:" CaptionPosition="CaptionPosition.Vertical" CaptionCssClass="popup-demo-caption" CssClass="popup-demo-item" ColSpanMd="12">
+        <DxFormLayoutItem Field="@nameof(ViewModel.Description)" 
+                          Caption="Description:" 
+                          CaptionPosition="CaptionPosition.Vertical" 
+                          CaptionCssClass="popup-demo-caption" 
+                          CssClass="popup-demo-item" ColSpanMd="12">
             <div>
-                <span class="popup-image popup-icon-birthday"></span>
-                @*                <DxTextBox Text="@(((string)((ValueEditContext)context).Value))" CssClass="popup-demo-textbox" />
-
-*@          
-
                 <DxMemo @bind-Text="@ViewModel.Description"
                         NullText="Description text"
                         Rows="4"

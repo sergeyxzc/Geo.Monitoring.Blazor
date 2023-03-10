@@ -3,9 +3,9 @@ using Geo.Monitoring.Blazor.Services;
 using Geo.Monitoring.Blazor.Services.Geo;
 using Microsoft.AspNetCore.Components;
 
-namespace Geo.Monitoring.Blazor.Components;
+namespace Geo.Monitoring.Blazor.Components.Dashboards;
 
-public partial class Dashboard : BaseApplicationComponent
+public partial class DashboardPage : BaseApplicationComponent
 {
     [Inject] public IUserService UserService { get; set; }
     [Inject] public IGeoServiceClient GeoService { get; set; }

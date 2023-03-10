@@ -42,7 +42,6 @@ public partial class ProjectsPage : BaseApplicationComponent
         try
         {
             Busy = true;
-            await Task.Delay(5000);
             var projects = await GeoService.GetCompanyProjectsAsync(ComponentCancellationToken);
             Projects = projects.Projects.Select(x => new ProjectViewModel(x)).ToList();
         }
