@@ -39,3 +39,26 @@ html, body {
     right: 0.75rem;
     top: 0.5rem;
 }
+
+
+.spinner {
+    border: 8px solid silver;
+    border-top: 8px solid #6f42c9;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 700ms linear infinite;
+    top: 40%;
+    left: 55%;
+    position: absolute;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg)
+    }
+
+    100% {
+        transform: rotate(360deg)
+    }
+}

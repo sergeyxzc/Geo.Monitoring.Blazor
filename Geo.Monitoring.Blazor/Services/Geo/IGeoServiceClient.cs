@@ -106,6 +106,8 @@ public class CompanyProjectDesc
 {
     public int Id { get; set; }
     public string Name { get; set; }
+    public string Description { get; set; }
+    public DateTime Created { get; set; }
     public int EmployeeCount { get; set; }
 }
 
@@ -141,11 +143,13 @@ public class CreateProjectResponse
 public class CreateProjectRequest
 {
     public string Name { get; set; }
+    public string Description { get; set; }
 }
 
 public class UpdateProjectRequest
 {
     public string Name { get; set; }
+    public string Description { get; set; }
 }
 
 public class UpdateProjectResponse

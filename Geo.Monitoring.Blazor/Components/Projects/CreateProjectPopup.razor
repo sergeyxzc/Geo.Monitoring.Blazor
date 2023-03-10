@@ -1,0 +1,81 @@
+﻿@using Geo.Monitoring.Blazor.Services
+@using Geo.Monitoring.Blazor.Services.Geo
+@using Refit
+@inherits Geo.Monitoring.Blazor.Components.Common.BaseApplicationComponent
+
+<DxPopup CssClass="popup-demo-events"
+         Visible="@Visible"
+         VisibleChanged="@PopupVisibleChanged"
+         ShowFooter="true"
+         CloseOnEscape="false"
+         CloseOnOutsideClick="false"
+         ShowCloseButton="false"
+         HeaderText="Create project"
+         MinWidth="50%">
+    <BodyContentTemplate>
+        <div>
+            <CreateProjectPopupForm ViewModel="@BodyViewModel"></CreateProjectPopupForm>
+        </div>
+    </BodyContentTemplate>
+    <FooterContentTemplate>
+        <div>
+            <DxButton CssClass="popup-demo-events-button ms-2"
+                      RenderStyle="ButtonRenderStyle.Primary"
+                      Text="Create"
+                      Click="@(async () => await CreateAsync())" />
+
+            <DxButton CssClass="popup-demo-events-button ms-2"
+                      RenderStyle="ButtonRenderStyle.Secondary"
+                      Text="Cancel"
+                      Click="CancelClick" />
+        </div>
+    </FooterContentTemplate>
+</DxPopup>
+
+@code {
+    [Inject] public IUserService UserService { get; set; }
+    [Inject] public IGeoServiceClient GeoService { get; set; }
+
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> PopupVisibleChanged { get; set; }
+    [Parameter] public EventCallback<CompanyProjectDesc> ProjectCreatedChanged { get; set; }
+
+    public CreateProjectPopupFormViewModel BodyViewModel { get; set; } = new();
+
+    bool MessageBoxVisible { get; set; }
+    void TryAgainClick()
+    {
+        MessageBoxVisible = false;
+    }
+
+    void CancelClick()
+    {
+        MessageBoxVisible = false;
+        Visible = false;
+        StateHasChanged();
+    }
+
+    public async Task CreateAsync()
+    {
+        try
+        {
+            var createProjectResponse = await GeoService.CreateProjectAsync(new CreateProjectRequest()
+                {
+                    Name = BodyViewModel.Name,
+                    Description = BodyViewModel.Description
+                }, ComponentCancellationToken);
+
+            var createdProject = await GeoService.GetProjectAsync(createProjectResponse.Id, ComponentCancellationToken);
+            await ProjectCreatedChanged.InvokeAsync(createdProject.Project);
+        }
+        catch (Exception)
+        {
+            // ignored
+        }
+        finally
+        {
+            Visible = false;
+            await PopupVisibleChanged.InvokeAsync(Visible);
+        }
+    }
+}

@@ -28,14 +28,21 @@ public partial class ProjectsPage : BaseApplicationComponent
     [Inject] public IGeoServiceClient GeoService { get; set; }
     [Inject] public NavigationManager NavigationManager { get; set; }
 
+    public bool CreateProjectVisible {get; set; }
     public bool Busy { get; set; }
     public List<ProjectViewModel> Projects { get; set; }
+
+    private void OnCreateProject(CompanyProjectDesc companyProjectDesc)
+    {
+        Projects.Add(new ProjectViewModel(companyProjectDesc));
+    }
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             Busy = true;
+            await Task.Delay(5000);
             var projects = await GeoService.GetCompanyProjectsAsync(ComponentCancellationToken);
             Projects = projects.Projects.Select(x => new ProjectViewModel(x)).ToList();
         }

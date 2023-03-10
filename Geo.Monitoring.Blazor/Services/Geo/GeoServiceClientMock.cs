@@ -54,7 +54,8 @@ public class GeoServiceClientMock : IGeoServiceClient
         {
             var p = new ProjectMock(GetNextId(), this)
             {
-                Name = name
+                Name = name,
+                Created = DateTime.UtcNow
             };
             Projects.Add(p);
             return p;
@@ -94,6 +95,8 @@ public class GeoServiceClientMock : IGeoServiceClient
         public int Id { get; }
         public CompanyMock Company { get; }
         public string Name { get; set; }
+        public DateTime Created { get; set; }
+        public string Description { get; set; }
         public List<int> Employees { get; } = new();
         public List<LoggerMock> Loggers { get; } = new();
 
@@ -214,8 +217,8 @@ public class GeoServiceClientMock : IGeoServiceClient
         var user = await _userService.GetUserContextAsync(CancellationToken.None);
         var employee = _companies
             .SelectMany(x => x.Employees)
-            .SingleOrDefault(x => 
-                x.Id == int.Parse(user.EmployeeId) && 
+            .SingleOrDefault(x =>
+                x.Id == int.Parse(user.EmployeeId) &&
                 x.Company.Id == int.Parse(user.CompanyId));
         return employee;
     }
@@ -280,6 +283,8 @@ public class GeoServiceClientMock : IGeoServiceClient
             {
                 Id = x.Id,
                 Name = x.Name,
+                Created = x.Created,
+                Description = x.Description,
                 EmployeeCount = x.Employees.Count
             }).ToArray()
         };
@@ -356,6 +361,8 @@ public class GeoServiceClientMock : IGeoServiceClient
         var loggedEmployee = await GetLoggedEmployeeAsync();
         var p = loggedEmployee.Company.Projects.First(x => x.Id == id);
         p.Name = request.Name;
+        p.Description = request.Description;
+        p.Created = DateTime.UtcNow;
         return new UpdateProjectResponse() { Id = p.Id };
     }
 
