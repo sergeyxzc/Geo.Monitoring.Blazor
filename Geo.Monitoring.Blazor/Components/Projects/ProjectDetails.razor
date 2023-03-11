@@ -1,0 +1,62 @@
+﻿<div class="d-flex justify-content-end my-3">
+    <DxButton Click="@OnEdit">@CommandName</DxButton>
+</div>
+<div class="d-flex flex-fill w-100">
+    <DxFormLayout Data="@ViewModel"
+                  CssClass="w-100">
+        <DxFormLayoutItem Field="@nameof(ViewModel.Name)"
+                          Caption="Name:"
+                          CaptionPosition="CaptionPosition.Vertical"
+                          CaptionCssClass="popup-demo-caption"
+                          CssClass="popup-demo-item"
+                          ColSpanMd="12">
+            <div>
+                <DxTextBox @bind-Text="@ViewModel.Name"
+                           CssClass="popup-demo-textbox"
+                           NullText="Project name"
+                           @bind-ReadOnly="@ReadOnly" />
+            </div>
+        </DxFormLayoutItem>
+        <DxFormLayoutItem Field="@nameof(ViewModel.Description)"
+                          Caption="Description:"
+                          CaptionPosition="CaptionPosition.Vertical"
+                          CaptionCssClass="popup-demo-caption"
+                          CssClass="popup-demo-item"
+                          ColSpanMd="12">
+            <div>
+                <DxMemo @bind-Text="@ViewModel.Description"
+                        NullText="Description text"
+                        Rows="4"
+                        @bind-ReadOnly="@ReadOnly"
+                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+            </div>
+
+
+        </DxFormLayoutItem>
+    </DxFormLayout>
+</div>
+
+@code {
+    [Parameter] public ProjectDetailsViewModel ViewModel { get; set; }
+
+    public bool ReadOnly { get; set; }
+    public string CommandName { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        UpdateCommandName();
+    }
+
+    private void OnEdit()
+    {
+        ReadOnly = !ReadOnly;
+        UpdateCommandName();
+    //StateHasChanged();
+    }
+
+    private void UpdateCommandName()
+    {
+        CommandName = ReadOnly ? "Edit" : "Save";
+
+    }
+}

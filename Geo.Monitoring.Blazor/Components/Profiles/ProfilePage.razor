@@ -1,0 +1,21 @@
+﻿@page "/profile"
+@inherits Geo.Monitoring.Blazor.Components.Common.BaseBusyApplicationComponent
+
+@if (Busy)
+{
+    <div class="spinner"></div>
+}
+else
+{
+    <div class="h5 d-flex flex-column text-muted text-uppercase">
+        <p>Company profile</p>
+    </div>
+    <hr class="text-dark" />
+}
+
+
+@code {
+    protected override async Task DoOnInitializedAsync()
+    {
+    }
+}
