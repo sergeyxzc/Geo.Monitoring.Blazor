@@ -5,25 +5,23 @@ using Microsoft.AspNetCore.Components;
 
 namespace Geo.Monitoring.Blazor.Components.Dashboards;
 
-public partial class DashboardPage : BaseApplicationComponent
+public partial class DashboardPage : BaseBusyApplicationComponent
 {
     [Inject] public IUserService UserService { get; set; }
     [Inject] public IGeoServiceClient GeoService { get; set; }
     public UserContext UserContext { get; set; }
     public CompanyDetails CompanyDetails { get; set; }
-    public bool Busy { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task DoOnInitializedAsync(MessageSubscriptionHolder messageSubscriptionHolder)
     {
         try
         {
-            Busy = true;
             UserContext = await UserService.GetUserContextAsync(ComponentCancellationToken);
             CompanyDetails = await GeoService.GetCompanyInfoAsync(ComponentCancellationToken);
         }
-        finally
+        catch
         {
-            Busy = false;
+            // ignored
         }
     }
 }

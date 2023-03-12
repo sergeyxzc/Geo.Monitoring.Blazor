@@ -33,7 +33,7 @@ public partial class ProjectPage : BaseBusyApplicationComponent
     [Parameter] public int ProjectId { get; set; }
     private ProjectViewModel ViewModel { get; set; }
 
-    protected override async Task DoOnInitializedAsync()
+    protected override async Task DoOnInitializedAsync(MessageSubscriptionHolder messageSubscriptionHolder)
     {
         var project = await GeoService.GetProjectAsync(ProjectId, ComponentCancellationToken);
         ViewModel = new ProjectViewModel(project.Project, project.Loggers);

@@ -1,6 +1,7 @@
 ﻿@using Geo.Monitoring.Blazor.Services
 @using Geo.Monitoring.Blazor.Services.Geo
-@inherits Geo.Monitoring.Blazor.Components.Common.BaseApplicationComponent
+@using Geo.Monitoring.Blazor.Messages
+@inherits Geo.Monitoring.Blazor.Components.Common.BaseBusyApplicationComponent
 
 @*<div class="sidebar @StateCssClass">
     <DxTreeView AllowSelectNodes="true" CssClass="app-sidebar">
@@ -16,6 +17,7 @@
 }*@
 
 @*nav-scrollable*@
+
 <div class="sidebar @StateCssClass">
     <nav class="flex-column">
         <div class="title justify-content-center px-3 pt-3">
@@ -25,23 +27,23 @@
         <hr class="text-white-50" />
 
         <div class="nav-item pt-3 px-3">
-            <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">
+            <NavLink class="@DisableCss" href="/" Match="NavLinkMatch.All">
                 <span class="oi oi-dashboard" aria-hidden="true"></span> Dashboard
             </NavLink>
         </div>
         <div class="nav-item pt-3 px-3">
-            <NavLink class="nav-link" href="/projects" Match="NavLinkMatch.All">
+            <NavLink class="@DisableCss" href="/projects" Match="NavLinkMatch.All">
                 <span class="oi oi-project" aria-hidden="true"></span> Projects
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="loggers">
+            <NavLink class="@DisableCss" href="loggers">
                 <span class="oi oi-fork" aria-hidden="true"></span> Loggers
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="profile">
+            <NavLink class="@DisableCss" href="profile">
                 <span class="oi oi-cog" aria-hidden="true"></span> Profile
             </NavLink>
         </div>
@@ -50,15 +52,17 @@
 
 @code 
 {
-    [Inject]  public IUserService UserService { get; set; }
+    [Inject] public IUserService UserService { get; set; }
     [Inject] public IGeoServiceClient GeoService { get; set; }
 
     [Parameter] public string StateCssClass { get; set; }
+    private readonly MessageSubscriptionHolder _messageSubscriptionHolder = new();
     private bool _collapseNavMenu = true;
     private string NavMenuCssClass => _collapseNavMenu ? "collapse" : null;
     private string CompanyName { get; set; }
+    private string DisableCss { get; set; } = "";
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task DoOnInitializedAsync(MessageSubscriptionHolder messageSubscriptionHolder)
     {
         try
         {
@@ -71,9 +75,14 @@
         }
     }
 
-
     private void ToggleNavMenu()
     {
         _collapseNavMenu = !_collapseNavMenu;
+    }
+
+    protected override void OnChangeBusy(bool busy)
+    {
+        DisableCss = Busy ? "nav-link disabled" : "nav-link";
+        StateHasChanged();
     }
 }

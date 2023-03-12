@@ -1,5 +1,5 @@
 ﻿@page "/"
-@inherits Geo.Monitoring.Blazor.Components.Common.BaseApplicationComponent
+@inherits Geo.Monitoring.Blazor.Components.Common.BaseBusyApplicationComponent
 
 @if (Busy)
 {
@@ -7,7 +7,7 @@
 }
 else
 {
-    <div class="h5 d-flex flex-column text-muted text-uppercase">
+    <div class="h5 d-flex flex-column text-muted">
         <p>Company</p>
     </div>
     <hr class="text-dark" />

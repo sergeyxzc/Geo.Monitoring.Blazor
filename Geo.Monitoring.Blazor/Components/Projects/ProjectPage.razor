@@ -1,18 +1,18 @@
 ﻿@page "/project/{ProjectId:int}"
 @inherits Geo.Monitoring.Blazor.Components.Common.BaseBusyApplicationComponent
 
-<div class="h5 d-flex flex-column text-muted text-uppercase">
+<div class="h5 d-flex flex-column text-muted">
     <p>Project: @ViewModel.Project.Name</p>
 </div>
 
 <div class="my-1">
     <DxTabs>
-        <DxTabPage Text="PROJECT">
+        <DxTabPage Text="Project">
             <div class="mt-3">
                 <ProjectDetails ViewModel="@ViewModel.ProjectDetails"></ProjectDetails>
             </div>
         </DxTabPage>
-        <DxTabPage Text="LOGGERS" TabIconCssClass="tabs-icon-products tabs-icon"></DxTabPage>
-        <DxTabPage Text="EMPLOYEES" TabIconCssClass="tabs-icon-support tabs-icon"></DxTabPage>
+        <DxTabPage Text="Loggers" TabIconCssClass="tabs-icon-products tabs-icon"></DxTabPage>
+        <DxTabPage Text="Employees" TabIconCssClass="tabs-icon-support tabs-icon"></DxTabPage>
     </DxTabs>
 </div>
